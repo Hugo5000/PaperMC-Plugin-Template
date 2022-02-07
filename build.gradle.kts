@@ -1,9 +1,7 @@
-import org.apache.tools.ant.filters.ReplaceTokens
-
 plugins {
     id("java")
     id("idea")
-    id("xyz.jpenilla.run-paper") version "1.0.3"
+    id("xyz.jpenilla.run-paper") version "1.0.6"
     id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
@@ -37,9 +35,9 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.advancedkind.plugin:utils:1.2.1")
+    compileOnly("com.advancedkind.plugin:utils:1.2.3")
     compileOnly("org.jetbrains:annotations:20.1.0")
-    compileOnly("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.18.1-R0.1-SNAPSHOT")
 
 }
 java {
