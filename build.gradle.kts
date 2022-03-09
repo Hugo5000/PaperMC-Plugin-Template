@@ -85,7 +85,7 @@ tasks {
     }
     runServer {
         dependsOn(build)
-        minecraftVersion("1.17.1")
+        minecraftVersion("1.18.1")
     }
     // plugin.yml placeholders
     processResources {
