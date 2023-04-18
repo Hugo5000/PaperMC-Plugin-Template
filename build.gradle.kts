@@ -1,12 +1,8 @@
 plugins {
     id("java")
     id("idea")
-    id("xyz.jpenilla.run-paper") version "1.0.6"
     id("com.github.johnrengelman.shadow") version "7.0.0"
 }
-
-val githubUsername: String by project
-val githubToken: String by project
 
 val pluginName: String by project
 val pluginVersion: String by project
@@ -23,28 +19,23 @@ repositories {
     mavenCentral()
     // paper-api
     maven("https://papermc.io/repo/repository/maven-public/")
-    // ADKUtils
-    maven {
-        url = uri("https://maven.pkg.github.com/Advanced-Kind-MC/ADKUtils")
-        credentials {
-            username = githubUsername
-            password = githubToken
-        }
-    }
-    mavenLocal()
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+//    mavenLocal()
 }
 
 dependencies {
-    compileOnly("com.advancedkind.plugin:utils:1.2.3")
-    compileOnly("org.jetbrains:annotations:20.1.0")
-    compileOnly("io.papermc.paper:paper-api:1.18.1-R0.1-SNAPSHOT")
-
+    compileOnly("org.jetbrains:annotations:24.0.1")
+    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
+    implementation("at.hugob.plugin.library:gui:0.0.0-SNAPSHOT")
+    implementation("at.hugob.plugin.library:command:0.0.0-SNAPSHOT")
+    implementation("at.hugob.plugin.library:config:0.0.0-SNAPSHOT")
 }
+
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     java.targetCompatibility = JavaVersion.VERSION_17
-    withSourcesJar()
-    withJavadocJar()
+//    withSourcesJar()
+//    withJavadocJar()
 }
 sourceSets {
     main {
@@ -68,25 +59,21 @@ idea {
     }
 }
 
+
+tasks.register<Copy>("prepareServer") {
+    dependsOn("build")
+    from(tasks.jar.get().archiveFile.get().asFile.path)
+    rename(tasks.jar.get().archiveFile.get().asFile.name, "$pluginName.jar")
+    into("G:\\paper\\plugins")
+}
+
 tasks {
-    shadowJar {
-        archiveClassifier.set("")
-        relocate("co.aikar.commands", "${pluginGroup}.${pluginArtifact}.acf")
-        relocate("co.aikar.locales", "${pluginGroup}.${pluginArtifact}.locales")
-    }
     compileJava {
         options.compilerArgs.add("-parameters")
         options.encoding = "UTF-8"
     }
     compileTestJava { options.encoding = "UTF-8" }
     javadoc { options.encoding = "UTF-8" }
-    build {
-        dependsOn(shadowJar)
-    }
-    runServer {
-        dependsOn(build)
-        minecraftVersion("1.18.1")
-    }
     // plugin.yml placeholders
     processResources {
         outputs.upToDateWhen { false }

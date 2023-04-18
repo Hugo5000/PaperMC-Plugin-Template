@@ -1,16 +1,16 @@
 package at.hugo.bukkit.plugin.example;
 
+import at.hugob.plugin.library.command.CommandManager;
+import at.hugob.plugin.library.config.YamlFileConfig;
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.CommandHelpHandler;
 import cloud.commandframework.arguments.standard.StringArgument;
-import com.advancedkind.plugin.utils.YamlFileConfig;
-import com.advancedkind.plugin.utils.command.CommandManager;
+import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.junit.runners.model.InitializationError;
 
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static net.kyori.adventure.text.Component.text;
@@ -25,13 +25,17 @@ public class ExamplePlugin extends JavaPlugin {
         messages = new YamlFileConfig(this, "messages.yml");
         reloadConfig();
         try {
-            commandManager = new CommandManager(this, Component.text()
-                .append(text("[", NamedTextColor.DARK_GRAY))
-                .append(text("Example", NamedTextColor.GOLD))
-                .append(text("] ", NamedTextColor.DARK_GRAY)).build(),
-                "/" + commandName + " help"
+            commandManager = new CommandManager(this,
+                    component -> messages.getComponent("prefix").append(text(" ")).append(component),
+                    "/" + commandName + " help",
+                    new CommandConfirmationManager<>(
+                            30L,
+                            TimeUnit.SECONDS,
+                            context -> context.getCommandContext().getSender().sendMessage(messages.getComponent("commands.confirm.needed")),
+                            sender -> sender.sendMessage(messages.getComponent("commands.confirm.nothing"))
+                    )
             );
-        } catch (InitializationError e) {
+        } catch (InstantiationException e) {
             e.printStackTrace();
             setEnabled(false);
         }
@@ -48,31 +52,31 @@ public class ExamplePlugin extends JavaPlugin {
     private void createCommands() {
         var builder = commandManager.manager().commandBuilder(commandName);
 
-        commandManager.command(commandManager.manager().commandBuilder("testcommand", ArgumentDescription.of("poop"))
-            .handler(commandContext ->
-                commandContext.getSender().sendMessage("test command was successful!")
-            )
-        );
         commandManager.command(builder.literal("help", ArgumentDescription.of("The main help command"))
-            .argument(StringArgument.<CommandSender>newBuilder("query").asOptional().withSuggestionsProvider((context, string) ->
-                commandManager.manager().getCommands().stream().map(c -> c.getArguments().stream().findFirst().get().getName()).collect(Collectors.toList())
-            ).withDefaultDescription(ArgumentDescription.of("The start of the command to query")))
-            .handler(commandContext -> {
-                String query = commandContext.getOrDefault("query", "");
-                commandManager.queryCommands(query == null ? "" : query, commandContext.getSender());
-            })
+                .permission("ah.commands.help")
+                .argument(StringArgument.<CommandSender>builder("query").greedy().asOptional().withSuggestionsProvider((context, string) ->
+                        commandManager.manager().createCommandHelpHandler().queryRootIndex(context.getSender()).getEntries().stream()
+                                .map(CommandHelpHandler.VerboseHelpEntry::getSyntaxString).collect(Collectors.toList())
+                ).withDefaultDescription(ArgumentDescription.of("The start of the command to query")))
+                .handler(commandContext -> {
+                    String query = commandContext.getOrDefault("query", "");
+                    commandManager.queryCommands(query == null ? "" : query, commandContext.getSender());
+                })
         );
         commandManager.command(builder.literal("reload", ArgumentDescription.of("Reloads this plugin"))
-            .handler(commandContext -> {
-                final var sender = commandContext.getSender();
-                sender.sendMessage(this.getMessagesConfig().getComponent("commands.reload.start"));
-                this.reloadConfig();
-                sender.sendMessage(this.getMessagesConfig().getComponent("commands.reload.finish"));
-            })
+                .permission("ah.admin.reload")
+                .handler(commandContext -> {
+                    final var sender = commandContext.getSender();
+                    sender.sendMessage(this.getMessagesConfig().getComponent("commands.reload.start"));
+                    this.reloadConfig();
+                    sender.sendMessage(this.getMessagesConfig().getComponent("commands.reload.finish"));
+                })
         );
-        commandManager.command(builder.literal("player")
-            .senderType(Player.class).handler(commandContext -> commandContext.getSender().sendMessage("You're a Player!"))
-        );
+        commandManager.command(builder.literal("version")
+                .permission("ah.admin.version")
+                .handler(commandContext ->
+                        commandContext.getSender().sendMessage(Component.text(getName() + " version " + getPluginMeta().getVersion()))
+                ));
     }
 
     public YamlFileConfig getMessagesConfig() {
