@@ -4,13 +4,14 @@ description: ${description}
 load: POSTWORLD
 api-version: ${api}
 author: Hugo B.
-authors:
-  - Matt12
 
+libraries:
+  - "at.hugob.plugin.library:database:1.0.0"
+  - "at.hugob.plugin.library:command:1.0.0"
+  - "at.hugob.plugin.library:config:1.0.0"
+  - "at.hugob.plugin.library:gui:0.0.0"
+  -
 main: ${group}.${artifact}.${main}
-
-depend:
-  - ADKUtils
 
 permissions:
   # main command
