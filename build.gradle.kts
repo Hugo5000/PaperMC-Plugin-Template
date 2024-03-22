@@ -1,7 +1,7 @@
 plugins {
     id("java")
     id("idea")
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 val pluginName: String by project
@@ -64,7 +64,7 @@ tasks.register<Copy>("prepareServer") {
     dependsOn("build")
     from(tasks.jar.get().archiveFile.get().asFile.path)
     rename(tasks.jar.get().archiveFile.get().asFile.name, "$pluginName.jar")
-    into("G:\\paper\\plugins")
+    into("G:\\Minecraft Servers\\paper\\plugins")
 }
 
 tasks {
