@@ -18,14 +18,14 @@ version = pluginVersion
 repositories {
     mavenCentral()
     // paper-api
-    maven("https://papermc.io/repo/repository/maven-public/")
+    maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 //    mavenLocal()
 }
 
 dependencies {
     compileOnly("org.jetbrains:annotations:24.0.1")
-    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
 
     compileOnly("at.hugob.plugin.library:database:1.0.0")
     compileOnly("at.hugob.plugin.library:command:1.0.0")
