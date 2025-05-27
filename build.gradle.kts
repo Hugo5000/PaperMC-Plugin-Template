@@ -28,9 +28,8 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
 
     compileOnly("at.hugob.plugin.library:database:1.0.0")
-    compileOnly("at.hugob.plugin.library:command:1.0.0")
-    compileOnly("at.hugob.plugin.library:config:1.0.0")
-    compileOnly("at.hugob.plugin.library:gui:0.0.0")
+    compileOnly("at.hugob.plugin.library:config:1.1.2")
+    compileOnly("at.hugob.plugin.library:gui:0.0.2")
 }
 
 java {
@@ -65,7 +64,7 @@ idea {
 tasks.register<Copy>("prepareServer") {
     dependsOn("build")
     from(tasks.jar.get().archiveFile.get().asFile.path)
-    rename(tasks.jar.get().archiveFile.get().asFile.name, "$pluginName.jar")
+    rename(tasks.jar.get().archiveFile.get().asFile.name, "${rootProject.name}.jar")
     into("G:\\Minecraft Servers\\paper\\plugins")
 }
 
@@ -79,7 +78,7 @@ tasks {
     // plugin.yml placeholders
     processResources {
         outputs.upToDateWhen { false }
-        filesMatching("**/plugin.yml") {
+        filesMatching("**/*plugin.yml") {
             expand(
                 mapOf(
                     "version" to pluginVersion,

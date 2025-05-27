@@ -1,0 +1,10 @@
+name: ${name}
+version: ${version}
+description: ${description}
+load: POSTWORLD
+api-version: ${api}
+author: Hugo B.
+bootstrapper: ${group}.${artifact}.plugin.${main}Bootstrap
+loader: ${group}.${artifact}.plugin.${main}ClassLoader
+
+main: ${group}.${artifact}.plugin.${main}
